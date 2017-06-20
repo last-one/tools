@@ -5,7 +5,7 @@
 DST=$1
 DATA=$2
 ATTRIBUTE=$3
-TOOLS=/home/hypan/caffe/build/tools
+TOOLS=/home/hypan/workspace/caffe/build/tools
 
 TRAIN_DATA_ROOT=$4
 TEST_DATA_ROOT=$5
@@ -39,13 +39,13 @@ fi
 echo "Creating train lmdb..."
 
 GLOG_logtostderr=1 $TOOLS/convert_imageset \
-    --resize_height=$RESIZE_HEIGHT \
-    --resize_width=$RESIZE_WIDTH \
-    --shuffle \
-    $TRAIN_DATA_ROOT \
-    $DATA/train.txt \
-    $DST/train_lmdb_shuffle \
-    $ATTRIBUTE
+		--resize_height=$RESIZE_HEIGHT \
+		--resize_width=$RESIZE_WIDTH \
+		--shuffle \
+		$TRAIN_DATA_ROOT \
+		$DATA/train.txt \
+		$DST/train_lmdb_shuffle \
+		$ATTRIBUTE
 
 echo "Creating val lmdb..."
 
