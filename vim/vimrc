@@ -54,3 +54,6 @@ filetype plugin indent on    " required
 
 map <F3> :set paste<CR>
 map <F4> :set nopaste<CR>
+if has("autocmd")
+	au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
