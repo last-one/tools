@@ -45,6 +45,8 @@ Plugin 'tomasr/molokai'
 let g:molokai_original = 1
 let g:rehash256 = 1
 Plugin 'flazz/vim-colorschemes'
+Plugin 'Yggdroot/indentLine'
+let g:indentLine_char = '|'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
