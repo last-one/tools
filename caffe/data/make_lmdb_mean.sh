@@ -4,7 +4,7 @@
 
 DATA=$1
 DIRPATH=$2
-TOOLS=/home/hypan/caffe/build/tools
+TOOLS=/home/hypan/workspace/caffe/build/tools
 
 $TOOLS/compute_image_mean $DATA/train_lmdb_shuffle \
   $DIRPATH/train.binaryproto
