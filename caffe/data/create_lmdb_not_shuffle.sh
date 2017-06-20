@@ -2,13 +2,14 @@
 # Create the imagenet lmdb inputs
 # N.B. set the path to the imagenet train + val data dirs
 
-EXAMPLE=/home/code/wangfang/caffe-master/models/faceAttribute/data/imdb_wiki
-DATA=/home/code/wangfang/caffe-master/data/imdb_wiki
-TOOLS=build/tools
+DST=$1
+DATA=$2
+ATTRIBUTE=$3
+TOOLS=/home/hypan/workspace/caffe/build/tools
 
-#TRAIN_DATA_ROOT=/home/code/wangfang/caffe-master/data/glasses/train_new/
-#VAL_DATA_ROOT=/home/code/wangfang/caffe-master/data/lfwa/
-TEST_DATA_ROOT=/home/code/wangfang/caffe-master/data/imdb_wiki/test/
+TRAIN_DATA_ROOT=$4
+TEST_DATA_ROOT=$5
+VAL_DATA_ROOT=$6
 
 # Set RESIZE=true to resize the images to 256x256. Leave as false if images have
 # already been resized using another tool.
@@ -35,25 +36,25 @@ fi
 #  exit 1
 #fi
 
-#echo "Creating train lmdb..."
+echo "Creating train lmdb..."
 
-#GLOG_logtostderr=1 $TOOLS/convert_imageset \
-#    --resize_height=$RESIZE_HEIGHT \
-#    --resize_width=$RESIZE_WIDTH \
-#    $TRAIN_DATA_ROOT \
-#    $DATA/train_new.txt \
-#    $EXAMPLE/glasses256_train_lmdb_not_shuffle \
-#    1
+GLOG_logtostderr=1 $TOOLS/convert_imageset \
+		--resize_height=$RESIZE_HEIGHT \
+		--resize_width=$RESIZE_WIDTH \
+		$TRAIN_DATA_ROOT \
+		$DATA/train.txt \
+		$DST/train_lmdb_shuffle \
+		$ATTRIBUTE
 
-#echo "Creating val lmdb..."
+echo "Creating val lmdb..."
 
-# GLOG_logtostderr=1 $TOOLS/convert_imageset \
-#     --resize_height=$RESIZE_HEIGHT \
-#     --resize_width=$RESIZE_WIDTH \
-#     $VAL_DATA_ROOT \
-#     $DATA/val_bald.txt \
-#     $EXAMPLE/celeba_bald_val_lmdb_not_shuffle \
-#     1
+GLOG_logtostderr=1 $TOOLS/convert_imageset \
+		--resize_height=$RESIZE_HEIGHT \
+		--resize_width=$RESIZE_WIDTH \
+		$VAL_DATA_ROOT \
+		$DATA/val.txt \
+		$DST/val_lmdb_shuffle \
+		$ATTRIBUTE
 
 echo "Creating test lmdb..."
 
@@ -62,7 +63,7 @@ GLOG_logtostderr=1 $TOOLS/convert_imageset \
     --resize_width=$RESIZE_WIDTH \
     $TEST_DATA_ROOT \
     $DATA/test.txt \
-    $EXAMPLE/imdb_wiki_test_lmdb_not_shuffle \
-    2
+    $DST/test_lmdb_shuffle \
+    $ATTRIBUTE
 
 echo "Done."
