@@ -7,9 +7,9 @@ DATA=$2
 ATTRIBUTE=$3
 TOOLS=/home/hypan/workspace/caffe/build/tools
 
-TRAIN_DATA_ROOT=$4
-TEST_DATA_ROOT=$5
-VAL_DATA_ROOT=$6
+#TRAIN_DATA_ROOT=$4
+TEST_DATA_ROOT=$4
+VAL_DATA_ROOT=$5
 
 # Set RESIZE=true to resize the images to 256x256. Leave as false if images have
 # already been resized using another tool.
@@ -46,24 +46,24 @@ fi
 		#$DST/train_lmdb_not_shuffle \
 		#$ATTRIBUTE
 
-#echo "Creating val lmdb..."
-
-#GLOG_logtostderr=1 $TOOLS/convert_imageset \
-		#--resize_height=$RESIZE_HEIGHT \
-		#--resize_width=$RESIZE_WIDTH \
-		#$VAL_DATA_ROOT \
-		#$DATA/val.txt \
-		#$DST/val_lmdb_not_shuffle \
-		#$ATTRIBUTE
-
-echo "Creating test lmdb..."
+echo "Creating val lmdb..."
 
 GLOG_logtostderr=1 $TOOLS/convert_imageset \
-    --resize_height=$RESIZE_HEIGHT \
-    --resize_width=$RESIZE_WIDTH \
-    $TEST_DATA_ROOT \
-    $DATA/test.txt \
-    $DST/test_lmdb_not_shuffle \
-    $ATTRIBUTE
+		--resize_height=$RESIZE_HEIGHT \
+		--resize_width=$RESIZE_WIDTH \
+		$VAL_DATA_ROOT \
+		$DATA/val.txt \
+		$DST/val_lmdb_not_shuffle \
+		$ATTRIBUTE
+
+#echo "Creating test lmdb..."
+
+#GLOG_logtostderr=1 $TOOLS/convert_imageset \
+    #--resize_height=$RESIZE_HEIGHT \
+    #--resize_width=$RESIZE_WIDTH \
+    #$TEST_DATA_ROOT \
+    #$DATA/test.txt \
+    #$DST/test_lmdb_not_shuffle \
+    #$ATTRIBUTE
 
 echo "Done."

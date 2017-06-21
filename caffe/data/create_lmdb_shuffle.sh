@@ -47,26 +47,26 @@ GLOG_logtostderr=1 $TOOLS/convert_imageset \
 		$DST/train_lmdb_shuffle \
 		$ATTRIBUTE
 
-echo "Creating val lmdb..."
+#echo "Creating val lmdb..."
 
-GLOG_logtostderr=1 $TOOLS/convert_imageset \
-		--resize_height=$RESIZE_HEIGHT \
-		--resize_width=$RESIZE_WIDTH \
-		--shuffle \
-		$VAL_DATA_ROOT \
-		$DATA/val.txt \
-		$DST/val_lmdb_shuffle \
-		$ATTRIBUTE
+#GLOG_logtostderr=1 $TOOLS/convert_imageset \
+		#--resize_height=$RESIZE_HEIGHT \
+		#--resize_width=$RESIZE_WIDTH \
+		#--shuffle \
+		#$VAL_DATA_ROOT \
+		#$DATA/val.txt \
+		#$DST/val_lmdb_shuffle \
+		#$ATTRIBUTE
 
-echo "Creating test lmdb..."
+#echo "Creating test lmdb..."
 
-GLOG_logtostderr=1 $TOOLS/convert_imageset \
-    --resize_height=$RESIZE_HEIGHT \
-    --resize_width=$RESIZE_WIDTH \
-    --shuffle \
-    $TEST_DATA_ROOT \
-    $DATA/test.txt \
-    $DST/test_lmdb_shuffle \
-    $ATTRIBUTE
+#GLOG_logtostderr=1 $TOOLS/convert_imageset \
+    #--resize_height=$RESIZE_HEIGHT \
+    #--resize_width=$RESIZE_WIDTH \
+    #--shuffle \
+    #$TEST_DATA_ROOT \
+    #$DATA/test.txt \
+    #$DST/test_lmdb_shuffle \
+    #$ATTRIBUTE
 
 echo "Done."
