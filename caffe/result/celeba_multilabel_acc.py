@@ -21,7 +21,7 @@ for line in lines:
     for i in range(cnt):
         gt_label = int(gt_labels[i])
         pd_label = pd_labels[i]
-        if pd_label > 0:
+        if pd_label >= 0:
             pd_label = 1
         else:
             pd_label = -1

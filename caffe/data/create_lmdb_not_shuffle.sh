@@ -36,25 +36,25 @@ fi
 #  exit 1
 #fi
 
-echo "Creating train lmdb..."
+#echo "Creating train lmdb..."
 
-GLOG_logtostderr=1 $TOOLS/convert_imageset \
-		--resize_height=$RESIZE_HEIGHT \
-		--resize_width=$RESIZE_WIDTH \
-		$TRAIN_DATA_ROOT \
-		$DATA/train.txt \
-		$DST/train_lmdb_shuffle \
-		$ATTRIBUTE
+#GLOG_logtostderr=1 $TOOLS/convert_imageset \
+		#--resize_height=$RESIZE_HEIGHT \
+		#--resize_width=$RESIZE_WIDTH \
+		#$TRAIN_DATA_ROOT \
+		#$DATA/train.txt \
+		#$DST/train_lmdb_not_shuffle \
+		#$ATTRIBUTE
 
-echo "Creating val lmdb..."
+#echo "Creating val lmdb..."
 
-GLOG_logtostderr=1 $TOOLS/convert_imageset \
-		--resize_height=$RESIZE_HEIGHT \
-		--resize_width=$RESIZE_WIDTH \
-		$VAL_DATA_ROOT \
-		$DATA/val.txt \
-		$DST/val_lmdb_shuffle \
-		$ATTRIBUTE
+#GLOG_logtostderr=1 $TOOLS/convert_imageset \
+		#--resize_height=$RESIZE_HEIGHT \
+		#--resize_width=$RESIZE_WIDTH \
+		#$VAL_DATA_ROOT \
+		#$DATA/val.txt \
+		#$DST/val_lmdb_not_shuffle \
+		#$ATTRIBUTE
 
 echo "Creating test lmdb..."
 
@@ -63,7 +63,7 @@ GLOG_logtostderr=1 $TOOLS/convert_imageset \
     --resize_width=$RESIZE_WIDTH \
     $TEST_DATA_ROOT \
     $DATA/test.txt \
-    $DST/test_lmdb_shuffle \
+    $DST/test_lmdb_not_shuffle \
     $ATTRIBUTE
 
 echo "Done."
