@@ -26,9 +26,9 @@ def get_transformer(net, mean_file):
     mean_blob = caffe.proto.caffe_pb2.BlobProto()
     mean_blob.ParseFromString(open(mean_file, 'rb').read())
     mean_np = caffe.io.blobproto_to_array(mean_blob)
-    mean_np = mean_np[0].mean(1).mean(1)
+    mean_np = mean_np[0]
 
-    transformer = caffe.io.Transformer({'data': net.blobs['data'].data.shape})
+    transformer = caffe.io.Transformer({'data': (1, 3, 256, 256)})
     transformer.set_transpose('data', (2, 0, 1))
     transformer.set_mean('data', mean_np)
     transformer.set_raw_scale('data', 255)
@@ -38,8 +38,8 @@ def get_transformer(net, mean_file):
 
 def crop(img, crop_size):
 
-    h = img.shape[0]
-    w = img.shape[1]
+    h = img.shape[1]
+    w = img.shape[2]
     if h <= crop_size:
         sh = 0
         eh = h
@@ -52,7 +52,7 @@ def crop(img, crop_size):
     else:
         sw = (w - crop_size) / 2
         ew = sw + crop_size
-    crop_img = img[sh: eh, sw: ew, ]
+    crop_img = img[:, sh: eh, sw: ew]
 
     return crop_img
 
@@ -64,10 +64,10 @@ def get_feature(net, transformer, args):
         name = picture.split('.')[0]
         picture_path = os.path.join(args.input_path, picture)
         img = caffe.io.load_image(picture_path)
-        crop_img = crop(img, args.crop_size)
-        tr_img = transformer.preprocess('data', crop_img)
+        tr_img = transformer.preprocess('data', img)
+        crop_img = crop(tr_img, args.crop_size)
 
-        net.blobs['data'].data[...] = tr_img
+        net.blobs['data'].data[...] = crop_img
         net.forward()
         feat = net.blobs[args.blob].data[0]
 
