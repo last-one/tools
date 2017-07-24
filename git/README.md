@@ -6,3 +6,7 @@
 >> git remote rm origin
 >> git remote add origin git@github.com:last-one/tools.git
 >> git push origin
+
+git add .
+git commit -m "comment"
+git push
