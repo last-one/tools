@@ -66,7 +66,7 @@ def train_val(model, args):
 
     if config.test_interval != 0 and args.val_file is not None:
         val_loader = torch.utils.data.DataLoader(
-                MydataFolder(traindir, args.root,
+                MydataFolder(valdir, args.root,
                     transforms.Compose([transforms.Scale(256),
                     transforms.CenterCrop(224),
                     transforms.ToTensor(),
