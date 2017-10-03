@@ -35,12 +35,16 @@ def parse():
 
     return parser.parse_args()
 
-def train_val(args):
+def construct_model(args):
 
-    resnet50 = torch.load(args.pretrained)
-    resnet50.fc = nn.Linear(2048, args.num_classes)
-    resnet50 = torch.nn.DataParallel(resnet50, device_ids=args.gpu).cuda(args.gpu[0])
-    
+    resnet152 = models.resnet152(True)
+    resnet152.fc = nn.Linear(2048, args.num_classes)
+    resnet152 = torch.nn.DataParallel(resnet152, device_ids=args.gpu).cuda()
+
+    return resnet152
+
+def train_val(model, args):
+
     traindir = args.train_file
     valdir = args.val_file
 
@@ -71,9 +75,9 @@ def train_val(args):
                 batch_size=config.batch_size, shuffle=False,
                 num_workers=config.workers, pin_memory=True)
     
-    criterion = nn.CrossEntropyLoss().cuda(args.gpu[0])
+    criterion = nn.CrossEntropyLoss().cuda()
     
-    optimizer = torch.optim.SGD(resnet50.parameters(), config.base_lr,
+    optimizer = torch.optim.SGD(model.parameters(), config.base_lr,
                                 momentum=config.momentum,
                                 weight_decay=config.weight_decay)
     
@@ -88,18 +92,18 @@ def train_val(args):
     best_model = 0
     learning_rate = config.base_lr
 
-    resnet50.train()
+    model.train()
     while iters < config.max_iter:
     
         for i, (input, label) in enumerate(train_loader):
 
             data_time.update(time.time() - end) 
 
-            label = label.cuda(args.gpu[0], async=True)
+            label = label.cuda(async=True)
             input_var = torch.autograd.Variable(input)
             label_var = torch.autograd.Variable(label)
 
-            output = resnet50(input_var)
+            output = model(input_var)
             loss = criterion(output, label_var)
             prec1, preck = accuracy(output.data, label, topk=(1, config.topk))
             losses.update(loss.data[0], input.size(0))
@@ -133,14 +137,14 @@ def train_val(args):
                 topk.reset()
     
             if config.test_interval != 0 and args.val_file is not None and iters % config.test_interval == 0:
-                resnet50.eval()
-    
+
+                model.eval()
                 for i, (input, label) in enumerate(val_loader):
-                    label = label.cuda(args.gpu[0], async=True)
+                    label = label.cuda(async=True)
                     input_var = torch.autograd.Variable(input, volatile=True)
                     label_var = torch.autograd.Variable(label, volatile=True)
     
-                    output = resnet50(input_var)
+                    output = model(input_var)
                     loss = criterion(output, label_var)
     
                     prec1, preck = accuracy(output.data, label, topk=(1, config.topk))
@@ -152,7 +156,10 @@ def train_val(args):
                 end = time.time()
                 is_best = top1.avg > best_model
                 best_model = max(best_model, top1.avg)
-                save_checkpoint(resnet50.state_dict(), is_best, 'iter_{}'.format(iters))
+                save_checkpoint({
+                    'iter': iters,
+                    'state_dict': model.state_dict(),
+                    }, is_best, 'resnet152_places365'.format(iters))
     
                 print(
                     'Test Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
@@ -168,7 +175,7 @@ def train_val(args):
                 top1.reset()
                 topk.reset()
                 
-                resnet50.train()
+                model.train()
     
             if iters == config.max_iter:
                 break
@@ -177,4 +184,4 @@ def train_val(args):
 if __name__ == '__main__':
 
     args = parse()
-    train_val(args)
+    train_val(construct_model(args), args)
