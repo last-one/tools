@@ -23,8 +23,8 @@ def read_data_file_with_dict(filename, root=None):
         while line:
             info = line.strip().split(' ')
             if root is not None:
-                #info[0] = root + info[0]
-                info[0] = os.path.join(root, info[0])
+                info[0] = root + info[0]
+                #info[0] = os.path.join(root, info[0])
             item = (info[0], int(info[1]))
             lists.append(item)
 
@@ -48,8 +48,8 @@ def read_data_file(filename, root=None):
         while line:
             info = line.strip().split(' ')
             if root is not None:
-                #info[0] = root + info[0]
-                info[0] = os.path.join(root, info[0])
+                info[0] = root + info[0]
+                #info[0] = os.path.join(root, info[0])
             item = (info[0], int(info[1]))
             lists.append(item)
             line = fp.readline()
@@ -78,6 +78,41 @@ def label_shuffle(dicts, max_number, idx):
             idx[cnt] = info[ids]
             cnt += 1
 
+def read_confusion_matrix(filepath):
+
+    x = np.load(filepath)
+    confusion_list = []
+    cnt = 0
+    for info in x:
+        ids = info.argsort()
+        lists = []
+        if ids[-1] != cnt:
+            lists.append(ids[-1])
+            if ids[-2] != cnt:
+                lists.append(ids[-2])
+            else:
+                lists.append(ids[-3])
+        else:
+            lists.append(ids[-2])
+            lists.append(ids[-3])
+        cnt += 1
+        confusion_list.append(lists)
+
+    return confusion_list
+
+def label_smoothing(label, confusion, num_classes):
+
+    alpha = 0.1
+    beta = 0.3
+    top_k = 3
+    smooth_label = np.empty(num_classes)
+    smooth_label.fill(alpha / (num_classes - top_k))
+    for x in confusion:
+        smooth_label[x] = beta / (top_k - 1)
+    smooth_label[label] = 1.0 - alpha - beta
+
+    return smooth_label
+
 class MydataFolder(data.Dataset):
     """A data loader where the list is arranged in this way:
     
@@ -105,12 +140,14 @@ class MydataFolder(data.Dataset):
                                             self.dataset.__shuffle__()'
     """
 
-    def __init__(self, filename, root=None, transform=None, label_shuffling=False):
+    def __init__(self, filename, root=None, transform=None, label_shuffling=False, label_smoothing=False, confusion_matrix_path=None):
 
         if label_shuffling:
             lists, dicts, max_number = read_data_file_with_dict(filename, root)
         else:
             lists = read_data_file(filename, root)
+        if label_smoothing:
+            confusion_list = read_confusion_matrix(confusion_matrix_path)
         if len(lists) == 0:
             raise(RuntimeError('Found 0 images in subfolders\n'))
 
@@ -119,11 +156,14 @@ class MydataFolder(data.Dataset):
         self.lists = lists
         self.load = pil_loader
         self.label_shuffling = label_shuffling
+        self.label_smoothing = label_smoothing
+        self.num_classes = len(self.dicts)
+        self.confusion_list = confusion_list
 
         if self.label_shuffling:
             self.dicts = dicts
             self.max_number = max_number
-            self.idx = [i for i in range(max_number * len(self.dicts))]
+            self.idx = [i for i in range(max_number * self.num_classes)]
         else:
             self.idx = [i for i in range(len(self.lists))]
 
@@ -143,12 +183,17 @@ class MydataFolder(data.Dataset):
         """
 
         path, label = self.lists[self.idx[index]]
+        if label_smoothing:
+            smooth_label = smoothing_label(label, self.confusion_list[label], self.num_classes)
         img = self.load(path)
 
         if self.transform is not None:
             img = self.transform(img)
         
-        return img, label
+        if label_smoothing:
+            return img, smooth_label
+        else:
+            return img, label
 
     def __len__(self):
         
